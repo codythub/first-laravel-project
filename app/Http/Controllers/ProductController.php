@@ -27,7 +27,7 @@ class ProductController extends Controller
 
         if ($request->filled('sort')) {
         $query->orderBy('price', $request->sort);
-        
+
     }
 
     return ProductResource::collection($query->paginate(5));
@@ -47,7 +47,14 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'description' => 'nullable',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
         
         $product = Product::create([
             'category_id' => $request->category_id,
@@ -55,7 +62,8 @@ class ProductController extends Controller
             'sku' => $request->sku,
             'price' => $request->price,
             'quantity' => $request->quantity,
-            'description' => $request->description
+            'description' => $request->description,
+            'image' => $imagePath,
         ]);
 
         return $product;
@@ -69,7 +77,14 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'description' => 'nullable',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        $imagePath = $product->image;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
 
         $product->update([
             'name' => $request->name,
